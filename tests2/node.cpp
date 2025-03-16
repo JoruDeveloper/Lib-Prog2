@@ -10,6 +10,12 @@ Node<elem>::Node() {
 }
 
 template <class elem>
+Node<elem>::Node(elem info) {
+    this-info = info;
+    this-next = NULL;
+}
+
+template <class elem>
 Node<elem>::Node(Node<elem>* next, Node<elem>* prev, elem info) {
     this->next = next;
     this->prev = prev;

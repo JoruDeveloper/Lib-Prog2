@@ -10,6 +10,7 @@ class Node {
     public:
         Node();
         Node(Node<elem> *next, Node<elem> *prev, elem info);
+        Node(elem info);
         ~Node(){};
         // Setters
         void setNext(Node<elem>*Node);
