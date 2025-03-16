@@ -10,7 +10,7 @@ LIBS = -lm
 CC = g++
 
 # Banderas del compilador, por ej -DDEBUG -O2 -O3 -Wall -g
-CFLAGS = -g
+CFLAGS = -std=c++98 -g
 
 # Palabras que usa el Makefile que podrían ser el nombre de un programa
 .PHONY: default all clean
