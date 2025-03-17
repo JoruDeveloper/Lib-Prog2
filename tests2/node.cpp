@@ -11,8 +11,8 @@ Node<elem>::Node() {
 
 template <class elem>
 Node<elem>::Node(elem info) {
-    this-info = info;
-    this-next = NULL;
+    this->info = info;
+    this->next = NULL;
 }
 
 template <class elem>

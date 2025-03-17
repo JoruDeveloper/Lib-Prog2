@@ -3,47 +3,47 @@
 
 template <class elem>
 List<elem>::List() {
-    first = NULL;
-    last = NULL;
-    length = 0;
+    this->first = NULL;
+    this->last = NULL;
+    this->length = 0;
 }
 
 template <class elem>
 List<elem>::List(const List<elem> &L){
-    first = NULL;
-    last = NULL;
-    length = 0;
-    copy(L);
+    this->first = NULL;
+    this->last = NULL;
+    this->length = 0;
+    this->copy(L);
 }
 
 template <class elem>
 List<elem>::~List() {
-    empty();
+    this->empty();
 }
 
 template <class elem>
 void List<elem>::copy(const List<elem> &L) {
-    empty();
+    this->empty();
     Node<elem> *current = L.first;
     int pos = 0;
     while (current) {
-        addElem(current->data, pos++);
+        this->addElem(current->info, pos++);
         current = current->next;
     }
 }
 
 template <class elem>
 bool List<elem>::isEmpty() {
-    return length == 0;
+    return this->length == 0;
 }
 
 template <class elem>
 bool List<elem>::isElem(elem e) {
 
-    Node<elem> *current = first;
+    Node<elem> *current = this->first;
 
     while (current) {
-        if (current->data == e) return true;
+        if (current->info == e) return true;
         current = current->next;
     }
 
@@ -53,51 +53,59 @@ bool List<elem>::isElem(elem e) {
 template <class elem>
 elem List<elem>::checkPos(int pos) {
 
-    if (pos < 0 || pos >= length) return NULL;
+    if (pos < 0 || pos >= this->length) throw std::out_of_range("Posición fuera de rango");
 
-    Node<elem> *current = first;
+    Node<elem> *current = this->first;
 
     for (int i = 0; i < pos; i++) {
         current = current->next;
     }
 
-    return current->data;
+    return current->info;
 }
 
 template <class elem>
 void List<elem>::addElem(elem e, int pos) {
 
-    if (pos < 0 || pos > length) return NULL;
+    if (pos < 0 || pos > this->length) throw std::out_of_range("Posición fuera de rango");
 
     Node<elem> *newNode = new Node<elem>(e);
 
     if (pos == 0) {
-        newNode->next = first;
-        first = newNode;
-        if (length == 0) last = newNode;
+        newNode->next = this->first;
+        newNode->prev = NULL;
+        this->first->prev = newNode;
+        this->first = newNode;
+        if (this->length == 0) this->last = newNode;
     } else {
-        Node<elem> *current = first;
+        Node<elem> *current = this->first;
         for (int i = 0; i < pos - 1; i++) {
             current = current->next;
         }
         newNode->next = current->next;
-        current->next = newNode;
-        if (newNode->next == NULL) last = newNode;
+        newNode->prev = current;
+
+        if (newNode->next == NULL ){ 
+            this->last = newNode;
+        } else {
+            newNode->next->prev = newNode;
+            current->next = newNode;
+        }
     }
-    length++;
+    this->length++;
 }
 
 template <class elem>
-int List<elem>::delete_first_elem(elem e) {
-    Node<elem> *current = first, *prev = NULL;
+int List<elem>::delete_first_elem(elem e) { // Arreglar lógica nodo prev
+    Node<elem> *current = this->first, *prev = NULL;
     int pos = 0;
     while (current) {
-        if (current->data == e) {
+        if (current->info == e) {
             if (prev) prev->next = current->next;
-            else first = current->next;
-            if (current == last) last = prev;
+            else this->first = current->next;
+            if (current == this->last) this->last = prev;
             delete current;
-            length--;
+            this->length--;
             return pos;
         }
         prev = current;
@@ -108,17 +116,17 @@ int List<elem>::delete_first_elem(elem e) {
 }
 
 template <class elem>
-void List<elem>::delete_all_elem(elem e) {
-    Node<elem> *current = first, *prev = NULL;
+void List<elem>::delete_all_elem(elem e) {  // Arreglar lógica nodo prev
+    Node<elem> *current = this->first, *prev = NULL;
     while (current) {
-        if (current->data == e) {
+        if (current->info == e) {
             Node<elem> *toDelete = current;
             if (prev) prev->next = current->next;
             else first = current->next;
-            if (current == last) last = prev;
+            if (current == last) this->last = prev;
             current = current->next;
             delete toDelete;
-            length--;
+            this->length--;
         } else {
             prev = current;
             current = current->next;
@@ -128,50 +136,54 @@ void List<elem>::delete_all_elem(elem e) {
 
 template <class elem>
 void List<elem>::deleteNode(int pos) {
-    if (pos < 0 || pos >= length) throw std::out_of_range("Posición fuera de rango");
-    Node<elem> *current = first, *prev = NULL;
+    if (pos < 0 || pos >= this->length) throw std::out_of_range("Posición fuera de rango");
+    Node<elem> *current = this->first;
     for (int i = 0; i < pos; i++) {
-        prev = current;
         current = current->next;
     }
-    if (prev) prev->next = current->next;
-    else first = current->next;
-    if (current == last) last = prev;
+    if(current->next!=NULL){
+        current->prev->next = current->next;
+        current->next->prev = current->prev;
+    } else {
+        current->prev->next = current->next;
+    }
     delete current;
-    length--;
+    this->length--;
 }
 
 template <class elem>
 void List<elem>::modifyNode(elem e, int pos) {
     if (pos < 0 || pos >= length) throw std::out_of_range("Posición fuera de rango");
-    Node<elem> *current = first;
+    Node<elem> *current = this->first;
     for (int i = 0; i < pos; i++) {
         current = current->next;
     }
-    current->data = e;
+    current->info = e;
 }
 
 template <class elem>
 void List<elem>::reverseList() {
-    Node<elem> *prev = NULL, *current = first, *next = NULL;
-    last = first;
+    Node<elem> *current = this->first, *next = NULL;
+    this->last = this->first;
     while (current) {
         next = current->next;
-        current->next = prev;
-        prev = current;
+        current->next = current->prev;
+        current->prev = next;
+        if (next==NULL) this->first = current;
         current = next;
     }
-    first = prev;
 }
 
 template <class elem>
 void List<elem>::bubbleSort(bool asc) {
-    if (length < 2) return;
-    for (int i = 0; i < length - 1; i++) {
+    if (this->length < 2) return;
+    for (int i = 0; i < this->length - 1; i++) {
         Node<elem> *current = first;
-        for (int j = 0; j < length - i - 1; j++) {
-            if ((asc && current->data > current->next->data) || (!asc && current->data < current->next->data)) {
-                std::swap(current->data, current->next->data);
+        for (int j = 0; j < this->length - i - 1; j++) {
+            if ((asc && current->info > current->next->info) || (!asc && current->info < current->next->info)) {
+                elem temp = current->info;
+                current->info = current->next->info;
+                current->next->info = temp;
             }
             current = current->next;
         }
@@ -180,49 +192,51 @@ void List<elem>::bubbleSort(bool asc) {
 
 template <class elem>
 void List<elem>::empty() {
-    while (first != NULL) {
-        Node<elem> *toDelete = first;
-        first = first->next;
+    while (this->first != NULL) {
+        Node<elem> *toDelete = this->first;
+        this->first = this->first->next;
         delete toDelete;
     }
-    last = NULL;
-    length = 0;
+    this->last = NULL;
+    this->length = 0;
 }
 
 template <class elem>
 List<elem>& List<elem>::operator=(const List<elem>& L) {
-    if (this != &L) copy(L);
+    if (this != &L) this->copy(L);
     return *this;
 }
 
 template <class elem>
 bool List<elem>::operator==(const List<elem> &L) {
-    if (length != L.length) return false;
-    Node<elem> *current1 = first, *current2 = L.first;
-    while (current1) {
-        if (current1->data != current2->data) return false;
+    if (this->length != L.length) return false;
+    Node<elem> *current1 = this->first, *current2 = L.first;
+    while (current1&&current2) {
+        if (current1->info != current2->info) return false;
         current1 = current1->next;
         current2 = current2->next;
     }
-    return true;
+    if((current1==NULL)&&(current2==NULL)) return true;
+
+    return false;
 }
 
 template <class elem>
 elem List<elem>::operator[](int pos) {
-    return checkPos(pos);
+    return this->checkPos(pos);
 }
 
 template <class elem>
 bool List<elem>::operator>(const List<elem> &L) {
-    return length > L.length;
+    return this->length > L.length;
 }
 
 template <class elem>
 bool List<elem>::operator<(const List<elem> &L) {
-    return length < L.length;
+    return this->length < L.length;
 }
 
 template <class elem>
 int List<elem>::getLength() {
-    return length;
+    return this->length;
 }
