@@ -101,9 +101,9 @@ int List<elem>::delete_first_elem(elem e) { // Arreglar lógica nodo prev
     int pos = 0;
     while (current) {
         if (current->info == e) {
-            if (prev) prev->next = current->next;
-            else this->first = current->next;
-            if (current == this->last) this->last = prev;
+            if (prev) prev->next = current->next;           // Posición != 0
+            else this->first = current->next;               // Posición = 0
+            if (current == this->last) this->last = prev;   // Posición = n
             delete current;
             this->length--;
             return pos;
@@ -121,9 +121,9 @@ void List<elem>::delete_all_elem(elem e) {  // Arreglar lógica nodo prev
     while (current) {
         if (current->info == e) {
             Node<elem> *toDelete = current;
-            if (prev) prev->next = current->next;
-            else first = current->next;
-            if (current == last) this->last = prev;
+            if (prev) prev->next = current->next;           // Posición != 0
+            else this->first = current->next;               // Posición = 0
+            if (current == this->last) this->last = prev;   // Posición = n
             current = current->next;
             delete toDelete;
             this->length--;
