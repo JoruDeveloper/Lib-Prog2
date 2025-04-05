@@ -45,6 +45,7 @@ Node<elem>::Node(Node<elem>* next, Node<elem>* prev, elem info) {
     this->info = info;
 }
 
+// Setters
 template <class elem>
 void Node<elem>::setNext(Node<elem>* node) {
     this->next = node;
