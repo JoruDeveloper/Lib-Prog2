@@ -331,10 +331,8 @@ template <class elem>
 void readColumnsToList(List<List<elem> >& resultList) {
     int columns;
 
-    // 1. Vaciar la lista resultado por si tenía contenido previo.
     resultList.empty();
 
-    // 2. Leer el número de columnas esperado de la primera línea.
     if ((std::cin >> columns) && columns > 0) {
 
         std::cin.ignore();
@@ -343,30 +341,47 @@ void readColumnsToList(List<List<elem> >& resultList) {
                 List<elem> columnList;
                 resultList.addElem(columnList, i);
             }
-        
-        // 5. Leer el resto del stream línea por línea.
+
         std::string linea;
         while (std::getline(std::cin, linea)) {
             if (linea.empty()) continue;
             
-            std::istringstream ss(linea); // Usar un stringstream para parsear la línea actual
+            std::istringstream ss(linea);
             elem value;
             int current_col_index = 0;
 
-            // 6. Leer valores de la línea actual y asignarlos a su columna.
-            //    El operador >> intentará leer un valor del tipo T.
             while (ss >> value && current_col_index < columns) {
                 
-                    // Obtener una REFERENCIA a la lista de la columna correspondiente.
                     List<elem>& target_column_list = resultList.getElemRefAt(current_col_index);
                     
-                    // Añadir el valor leído al final de la lista de esa columna.
                     target_column_list.addElem(value, target_column_list.getLength());
 
-            current_col_index++; // Moverse a la siguiente columna para la próxima lectura.
+            current_col_index++;
         }
     }
 }
+}
+
+void readRowToList(List<std::string>& resultList) {
+    resultList.empty();
+
+    std::string linea;
+    if (std::getline(std::cin, linea)) {
+
+        if (!linea.empty()) {
+            // Usar un stringstream para parsear la línea leída.
+            std::istringstream ss(linea);
+            std::string item;
+
+            // El operador >> leerá elementos hasta el siguiente espacio en blanco.
+            while (ss >> item) {
+
+                resultList.addElem(item, resultList.getLength());
+            }
+        }
+    }
+    // readColumnsToList<std::string>(L);
+
 }
 
 int stringToInt(const std::string& str) {
@@ -383,6 +398,30 @@ int stringToInt(const std::string& str) {
     // int num = stringToInt(cadena);
 
     return num;
+}
+
+std::string cleanString(const std::string& dirtyString, const std::string& unwantedSymbol) {
+    std::string cleanedString;
+    
+    // Recorrer cada carácter de la cadena original
+    for (size_t i = 0; i < dirtyString.size(); ++i) {
+        bool isUnwanted = false;
+        
+        // Verificar si el carácter está en la lista de no deseados
+        for (size_t j = 0; j < unwantedSymbol.size(); ++j) {
+            if (dirtyString[i] == unwantedSymbol[j]) {
+                isUnwanted = true;
+                break;
+            }
+        }
+        
+        // Si no es un carácter no deseado, agregarlo a la cadena limpia
+        if (!isUnwanted) {
+            cleanedString += dirtyString[i];
+        }
+    }
+    
+    return cleanedString;
 }
 
 #endif
