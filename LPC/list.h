@@ -424,4 +424,38 @@ std::string cleanString(const std::string& dirtyString, const std::string& unwan
     return cleanedString;
 }
 
+template <class elem>
+elem findMax(const List<elem>& list) {
+    if (list.isEmpty()) {
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    elem max = list[0];  // Asumimos que el primer elemento es el máximo inicial
+    
+    for (int i = 1; i < list.getLength(); ++i) {
+        if (list[i] > max) {
+            max = list[i];
+        }
+    }
+    
+    return max;
+}
+
+template <class elem>
+elem findMin(const List<elem>& list) {
+    if (list.isEmpty()) {
+        throw std::runtime_error("La lista está vacía");
+    }
+
+    elem min = list[0];  // Asumimos que el primer elemento es el máximo inicial
+    
+    for (int i = 1; i < list.getLength(); ++i) {
+        if (list[i] < min) {
+            min = list[i];
+        }
+    }
+    
+    return min;
+}
+
 #endif
