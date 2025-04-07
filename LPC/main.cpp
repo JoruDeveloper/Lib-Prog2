@@ -1,36 +1,61 @@
-#include "stack.h"
+#include "list.h"
 #include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <typeinfo>
 
 int main() {
-    Stack<int> pila;
+    List<List<std::string> > L;
+    List<std::string> LAux;
+    bool flag;
+    int counter;
 
-    // Verificar si la pila está vacía
-    std::cout << "¿Está vacía la pila? " << (pila.isEmpty() ? "Sí" : "No") << std::endl;
+    readColumnsToList<std::string>(L);
 
-    // Agregar elementos a la pila
-    pila.push(10);
-    pila.push(20);
-    pila.push(30);
-    
-    std::cout << "Elemento en la cima: " << pila.top() << std::endl;
+        // for (int i = 0; i < L.getLength(); ++i) {
+            
+        //     List<std::string>& current_column = L.getElemRefAt(i);
 
-    // Eliminar un elemento
-    pila.pop();
-    std::cout << "Elemento en la cima después de pop: " << pila.top() << std::endl;
+        //     for (int j = 0; j < current_column.getLength(); ++j) {
+        //         std::cout << current_column.checkPos(j);
+        //     }
 
-    // Verificar si la pila está vacía después de algunas operaciones
-    std::cout << "¿Está vacía la pila? " << (pila.isEmpty() ? "Sí" : "No") << std::endl;
+        // }
 
-    // Eliminar todos los elementos
-    pila.pop();
-    pila.pop();
-    
-    // Intentar hacer pop en una pila vacía
-    try {
-        pila.pop();
-    } catch (const std::out_of_range &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    counter = 0;
+
+    for (int i = 0; i < L.getLength(); ++i)
+    { // Columna
+
+        List<std::string> &current_column = L.getElemRefAt(i);
+
+        LAux.empty();
+        flag = false;
+
+        for (int j = 1; j < current_column.getLength(); ++j){
+
+            
+            if (stringToInt(current_column.checkPos(j)) > stringToInt(current_column.checkPos(j - 1))){
+                LAux.addElem(current_column.checkPos(j), LAux.getLength());
+            }
+
+        }
+
+        if (!LAux.isEmpty())
+        {
+            for (int j = 0; j < LAux.getLength(); ++j)
+            {
+                current_column.delete_first_elem(LAux.checkPos(j));
+            }
+            i--;
+            counter++;
+        }
+        else
+        {
+            std::cout << counter << std::endl;
+            counter = 0;
+        }
+
     }
-
-    return 0;
 }

@@ -3,6 +3,7 @@
 #include "node.h"
 #include <stdexcept>
 #include <iostream>
+#include <sstream>
 
 template <class elem>
 class List{
@@ -35,6 +36,8 @@ class List{
     bool operator<(const List<elem> &L);
     // Set Get
     int getLength();
+    elem& getElemRefAt(int pos);
+    const elem& getElemRefAt(int pos) const;
 };
 
 template <class elem>
@@ -161,19 +164,49 @@ void List<elem>::delete_all_elem(elem e) {
     }
 }
 
+
+// void List<elem>::deleteNode(int pos) {
+//     if (pos < 0 || pos >= this->length) throw std::out_of_range("Posicion fuera de rango");
+//     Node<elem> *current = this->first;
+//     for (int i = 0; i < pos; i++) {
+//         current = current->getNext();
+//     }
+//     if (current->getPrev()) current->getPrev()->setNext(current->getNext());
+//     else this->first = current->getNext();
+//     if (current->getNext()) current->getNext()->setPrev(current->getPrev());
+//     else this->last = current->getPrev();
+//     delete current;
+//     this->length--;
+// }
 template <class elem>
 void List<elem>::deleteNode(int pos) {
-    if (pos < 0 || pos >= this->length) throw std::out_of_range("Posici\u00f3n fuera de rango");
+    if (pos < 0 || pos >= this->length) throw std::out_of_range("Posicion fuera de rango");
     Node<elem> *current = this->first;
     for (int i = 0; i < pos; i++) {
         current = current->getNext();
     }
-    if (current->getPrev()) current->getPrev()->setNext(current->getNext());
-    else this->first = current->getNext();
-    if (current->getNext()) current->getNext()->setPrev(current->getPrev());
-    else this->last = current->getPrev();
+
+    // Actualizar punteros de nodos adyacentes
+    if (current->getPrev()) {
+        current->getPrev()->setNext(current->getNext());
+    } else {
+        this->first = current->getNext();
+    }
+
+    if (current->getNext()) {
+        current->getNext()->setPrev(current->getPrev());
+    } else {
+        this->last = current->getPrev();
+    }
+
+    // Si la lista queda vacía, resetear first y last
+    if (this->length == 1) {
+        this->first = NULL;
+        this->last = NULL;
+    }
+
     delete current;
-    this->length--;
+    this->length--;  // Decrementar length
 }
 
 template <class elem>
@@ -264,6 +297,92 @@ bool List<elem>::operator<(const List<elem> &L) {
 template <class elem>
 int List<elem>::getLength() {
     return this->length;
+}
+
+template <class elem>
+elem& List<elem>::getElemRefAt(int pos) {
+    if (pos < 0 || pos >= this->length) {
+        throw std::out_of_range("Posicion fuera de rango en getElemRefAt");
+    }
+    Node<elem> *current = this->first;
+    // Avanza hasta el nodo en la posición 'pos'
+    for (int i = 0; i < pos; ++i) { // Puedes usar ++i o i++
+        current = current->getNext();
+    }
+    // Devuelve la referencia usando el método getInfoRef() del Nodo
+    return current->getInfoRef();
+}
+
+template <class elem>
+const elem& List<elem>::getElemRefAt(int pos) const { // Nota el 'const' al final
+    if (pos < 0 || pos >= this->length) {
+        throw std::out_of_range("Posicion fuera de rango en getElemRefAt (const)");
+    }
+    const Node<elem> *current = this->first; // Importante usar const Node*
+    // Avanza hasta el nodo en la posición 'pos'
+    for (int i = 0; i < pos; ++i) {
+        current = current->getNext();
+    }
+    // Devuelve la referencia constante usando la versión const de getInfoRef()
+    return current->getInfoRef();
+}
+
+template <class elem>
+void readColumnsToList(List<List<elem> >& resultList) {
+    int columns;
+
+    // 1. Vaciar la lista resultado por si tenía contenido previo.
+    resultList.empty();
+
+    // 2. Leer el número de columnas esperado de la primera línea.
+    if ((std::cin >> columns) && columns > 0) {
+
+        std::cin.ignore();
+
+            for (int i = 0; i < columns; ++i) {
+                List<elem> columnList;
+                resultList.addElem(columnList, i);
+            }
+        
+        // 5. Leer el resto del stream línea por línea.
+        std::string linea;
+        while (std::getline(std::cin, linea)) {
+            if (linea.empty()) continue;
+            
+            std::istringstream ss(linea); // Usar un stringstream para parsear la línea actual
+            elem value;
+            int current_col_index = 0;
+
+            // 6. Leer valores de la línea actual y asignarlos a su columna.
+            //    El operador >> intentará leer un valor del tipo T.
+            while (ss >> value && current_col_index < columns) {
+                
+                    // Obtener una REFERENCIA a la lista de la columna correspondiente.
+                    List<elem>& target_column_list = resultList.getElemRefAt(current_col_index);
+                    
+                    // Añadir el valor leído al final de la lista de esa columna.
+                    target_column_list.addElem(value, target_column_list.getLength());
+
+            current_col_index++; // Moverse a la siguiente columna para la próxima lectura.
+        }
+    }
+}
+}
+
+int stringToInt(const std::string& str) {
+    std::istringstream iss(str);
+    int num;
+    
+    iss >> num;
+
+    long long temp;
+    std::istringstream iss_ll(str);
+    iss_ll >> temp;
+    
+    // std::string cadena = "12123123";
+    // int num = stringToInt(cadena);
+
+    return num;
 }
 
 #endif

@@ -22,6 +22,8 @@ class Node {
         Node<elem>* getNext();
         Node<elem>* getPrev();
         elem getInfo();
+        elem &getInfoRef();
+        const elem &getInfoRef() const;
 };
 
 template <class elem>
@@ -74,6 +76,17 @@ Node<elem>* Node<elem>::getPrev() {
 
 template <class elem>
 elem Node<elem>::getInfo() {
+    return this->info;
+}
+
+template <class elem>
+elem& Node<elem>::getInfoRef() {
+    return this->info;
+}
+
+
+template <class elem>
+const elem& Node<elem>::getInfoRef() const {
     return this->info;
 }
 
