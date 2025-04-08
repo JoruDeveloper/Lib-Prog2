@@ -1,0 +1,5 @@
+2
+4 3 2
+[(alvaro, 3), (giuli, 2), (jp, 3), (manu, 3), (maxi, 2), (heidy, 3), (juanca, 1), (nima, 1)]
+3 2 1
+[(paul, 1), (marysabel, 2), (carlos, 3), (alvaro, 3), (omar, 3), (robert, 3), (karem, 3)]

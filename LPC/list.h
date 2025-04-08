@@ -17,9 +17,9 @@ class List{
     List(const List<elem> &L);
     ~List();
     void copy(const List<elem> &L);
-    bool isEmpty();
+    bool isEmpty() const;
     bool isElem(elem e);
-    elem checkPos(int pos);
+    elem checkPos(int pos) const;
     void addElem(elem e, int pos);
     int delete_first_elem(elem e); // Elimina el primer elemento e y retorna su posición
     void delete_all_elem(elem e); // Elimina todos los elementos e
@@ -31,11 +31,11 @@ class List{
     // Operadores Miembros
     List<elem>& operator=(const List<elem>&L);
     bool operator==(const List<elem> &L);
-    elem operator[](int pos);
+    elem operator[](int pos) const;
     bool operator>(const List<elem> &L);
     bool operator<(const List<elem> &L);
     // Set Get
-    int getLength();
+    int getLength() const;
     elem& getElemRefAt(int pos);
     const elem& getElemRefAt(int pos) const;
 };
@@ -72,7 +72,7 @@ void List<elem>::copy(const List<elem> &L) {
 }
 
 template <class elem>
-bool List<elem>::isEmpty() {
+bool List<elem>::isEmpty() const{
     return this->length == 0;
 }
 
@@ -87,7 +87,7 @@ bool List<elem>::isElem(elem e) {
 }
 
 template <class elem>
-elem List<elem>::checkPos(int pos) {
+elem List<elem>::checkPos(int pos) const{
     if (pos < 0 || pos >= this->length) throw std::out_of_range("Posici\u00f3n fuera de rango");
     Node<elem> *current = this->first;
     for (int i = 0; i < pos; i++) {
@@ -280,7 +280,7 @@ bool List<elem>::operator==(const List<elem> &L) {
 }
 
 template <class elem>
-elem List<elem>::operator[](int pos) {
+elem List<elem>::operator[](int pos) const{
     return this->checkPos(pos);
 }
 
@@ -295,7 +295,7 @@ bool List<elem>::operator<(const List<elem> &L) {
 }
 
 template <class elem>
-int List<elem>::getLength() {
+int List<elem>::getLength() const{
     return this->length;
 }
 
@@ -375,7 +375,6 @@ void readRowToList(List<std::string>& resultList) {
 
             // El operador >> leerá elementos hasta el siguiente espacio en blanco.
             while (ss >> item) {
-
                 resultList.addElem(item, resultList.getLength());
             }
         }
