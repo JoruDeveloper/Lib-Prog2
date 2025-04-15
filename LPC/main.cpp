@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <fstream>
 
 int main() {
     List<List<std::string> > L;
