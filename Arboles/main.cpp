@@ -4,6 +4,8 @@
 #include <exception> // Para std::exception
 #include "bin_tree.h" // Asume que bin_tree.h incluye node_bin_tree.h
 
+
+
 // Helper function to print elements of a list
 template <class T>
 void printList(const std::list<T>& l, const std::string& title) {
