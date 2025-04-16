@@ -23,85 +23,95 @@ void printList(const std::list<T>& l, const std::string& title) {
 
 int main() {
 
-    BinTree<std::string> treeCase; 
+    BinTree<std::string> treeCase;                                          // Declaración de clases
     int cases = 0, n_trees = 0, height, distance, count_MUP, max_MUP;
     std::string line1, line2, line_alumn, firstOrder, secondOrder, value;
     std::list<std::string> LInorden, LPreorden, LPostorden, LAlumn;
 
-    if (!(std::cin >> cases)) {
+    if (!(std::cin >> cases)) {         // Leer el número de casos
          std::cerr << "Error al leer el numero de casos." << std::endl;
          return 1;
     }
+
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    for (int i = 0; i < cases; i++) {
-
+    for (int i = 0; i < cases; i++) {   // Ciclo para el número de casos
         max_MUP = 0;
 
-        if (!(std::cin >> n_trees)) {
-            std::cerr << "Error al leer el numero de arboles" << i + 1 << std::endl;
+        if (!(std::cin >> n_trees)) {   // Leer el número de secciones
+            std::cerr << "Error al leer el numero de secciones" << std::endl;
             return 1;
         }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        for (int j = 0; j < n_trees; j++) {
+        for (int j = 0; j < n_trees; j++) { // Ciclo para el número de secciones
 
-            LInorden.clear();
+            LInorden.clear();       // Limpiar todas las listas
             LPreorden.clear();
             LPostorden.clear();
             LAlumn.clear();
 
-            treeCase.makeEmpty();
+            treeCase.makeEmpty();   // Limpiar el arbol
 
-            if (!std::getline(std::cin, line1) || line1.empty()) {
-                 std::cerr << "Error al leer la primera linea de orden o esta vacia." << std::endl;
+            if (!std::getline(std::cin, line1) || line1.empty()) {  // Leer Primera línea del caso
+                 std::cerr << "Error Linea 1" << std::endl;
                  return 1;
             }
+
             std::istringstream ss1(line1);
             ss1 >> firstOrder;
 
-            if (!std::getline(std::cin, line2) || line2.empty()) {
-                 std::cerr << "Error al leer la segunda linea de orden o esta vacia." << std::endl;
+            if (!std::getline(std::cin, line2) || line2.empty()) {// Leer segunda línea del caso
+                 std::cerr << "Error Linea 2" << std::endl;
                  return 1;
             }
+            
             std::istringstream ss2(line2);
             ss2 >> secondOrder;
 
-            if (firstOrder == "INORDEN") {
-                while (ss1 >> value) { LInorden.push_back(value); }
-            } else if (firstOrder == "PREORDEN") {
-                while (ss1 >> value) { LPreorden.push_back(value); }
-            } else if (firstOrder == "POSTORDEN") {
-                while (ss1 >> value) { LPostorden.push_back(value); }
-            } else {
-                std::cerr << "Error: Orden desconocido en la primera linea: " << firstOrder << std::endl;
+            if (firstOrder == "INORDEN"){
+                while (ss1 >> value){
+                    LInorden.push_back(value); 
+                }
+            } else if (firstOrder == "PREORDEN"){
+                while (ss1 >> value){
+                    LPreorden.push_back(value); 
+                    }
+            } else if (firstOrder == "POSTORDEN"){
+                while (ss1 >> value){
+                    LPostorden.push_back(value);
+                }
+            } else 
                 return 1;
-            }
 
-            if (secondOrder == "INORDEN") {
-                while (ss2 >> value) { LInorden.push_back(value); }
-            } else if (secondOrder == "PREORDEN") {
-                while (ss2 >> value) { LPreorden.push_back(value); }
-            } else if (secondOrder == "POSTORDEN") {
-                while (ss2 >> value) { LPostorden.push_back(value); }
-            } else {
-                 std::cerr << "Error: Orden desconocido en la segunda linea: " << secondOrder << std::endl;
+            if (secondOrder == "INORDEN"){
+                while (ss2 >> value){
+                    LInorden.push_back(value);
+                }
+            } else if (secondOrder == "PREORDEN"){
+                while (ss2 >> value){
+                    LPreorden.push_back(value);
+                }
+            } else if (secondOrder == "POSTORDEN"){
+                while (ss2 >> value){
+                    LPostorden.push_back(value);
+                }
+            } else
                  return 1;
-            }
 
-            if (LInorden.empty() || (LPreorden.empty() && LPostorden.empty())) {
-                 std::cerr << "Error: No se pudo leer INORDEN y PREORDEN/POSTORDEN correctamente." << std::endl;
-                 return 1;
-            }
-             if (!LPreorden.empty() && !LPostorden.empty()) {
-                 std::cerr << "Error: Se leyeron PREORDEN y POSTORDEN para el mismo arbol." << std::endl;
-                 return 1;
-            }
+            // if (LInorden.empty() || (LPreorden.empty() && LPostorden.empty())) {
+            //      std::cerr << "Error: No se pudo leer INORDEN y PREORDEN/POSTORDEN correctamente." << std::endl;
+            //      return 1;
+            // }
+            //  if (!LPreorden.empty() && !LPostorden.empty()) {
+            //      std::cerr << "Error: Se leyeron PREORDEN y POSTORDEN para el mismo arbol." << std::endl;
+            //      return 1;
+            // }
 
-            if (!std::getline(std::cin, line_alumn) || line_alumn.empty()) {
-                 std::cerr << "Error al leer la linea de alumnos o esta vacia." << std::endl;
-                 return 1;
-            }
+            // if (!std::getline(std::cin, line_alumn) || line_alumn.empty()) {
+            //      std::cerr << "Error al leer la linea de alumnos o esta vacia." << std::endl;
+            //      return 1;
+            // }
             std::istringstream ss_alumn(line_alumn);
             while (ss_alumn >> value) {
                 LAlumn.push_back(value);
@@ -119,6 +129,8 @@ int main() {
             distance = 0;
             height = 0;
 
+            // printTreeStructure(treeCase);
+
             for (std::list<std::string>::iterator i = LAlumn.begin(); i != LAlumn.end(); ++i) {
                 for (std::list<std::string>::iterator j = i; j != LAlumn.end(); ++j) {
                     if (i == j) continue;
@@ -128,7 +140,9 @@ int main() {
 
                     count_MUP += distance * height;
 
-
+                    // std::cout << "Distancia de " << *i << " hasta "<< *j << " = "<< distance << std::endl;
+                    // std::cout << "Altura de " << *i << " hasta "<< *j << " = "<< height << std::endl;
+                    // std::cout << "MUP = "<< count_MUP << std::endl;
                 }
             }
 
@@ -137,12 +151,13 @@ int main() {
             }
 
             
-
+            
+            std::cout << max_MUP << std::endl;
         }
 
-        std::cout << max_MUP << std::endl;
 
     }
 
     return 0;
 }
+

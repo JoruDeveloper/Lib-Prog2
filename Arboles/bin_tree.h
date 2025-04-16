@@ -682,4 +682,51 @@ void BinTree<elem>::makeEmpty() {
     CLEAR();
 }
 
+// Gracias StackOverflow
+
+template <class elem>
+void printTreeStructure(const BinTree<elem>& tree) {
+    if (!tree.isEmpty()) {
+
+        std::cout << tree.getRootInfo() << std::endl;
+
+        BinTree<elem> left = tree.getLeftSubtree();
+        BinTree<elem> right = tree.getRightSubtree();
+
+
+        std::string childPrefix = "";
+
+        if (!left.isEmpty() && !right.isEmpty()) {
+            printTreeRecursiveHelper(left, childPrefix, false);
+            printTreeRecursiveHelper(right, childPrefix, true);
+        } else if (!left.isEmpty()) {
+            printTreeRecursiveHelper(left, childPrefix, true);
+        } else if (!right.isEmpty()) {
+            printTreeRecursiveHelper(right, childPrefix, true);
+        }
+    } else {
+        std::cout << "<empty tree>" << std::endl;
+    }
+}
+
+template <class elem>
+void printTreeRecursiveHelper(const BinTree<elem>& subtree, const std::string& prefix, bool isTail) {
+
+    std::cout << prefix << (isTail ? "└── " : "├── ") << subtree.getRootInfo() << std::endl;
+
+    std::string childrenBasePrefix = prefix + (isTail ? "    " : "│   ");
+
+    BinTree<elem> left = subtree.getLeftSubtree();
+    BinTree<elem> right = subtree.getRightSubtree();
+
+    if (!left.isEmpty() && !right.isEmpty()) {
+        printTreeRecursiveHelper(left, childrenBasePrefix, false);
+        printTreeRecursiveHelper(right, childrenBasePrefix, true);
+    } else if (!left.isEmpty()) {
+        printTreeRecursiveHelper(left, childrenBasePrefix, true);
+    } else if (!right.isEmpty()) {
+        printTreeRecursiveHelper(right, childrenBasePrefix, true);
+    }
+}
+
 #endif
