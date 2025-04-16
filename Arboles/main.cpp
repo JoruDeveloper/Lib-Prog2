@@ -2,202 +2,168 @@
 #include <list>
 #include <string>
 #include <exception>
-#include "n_tree.h" // Asume que incluye node_n_tree.h
+#include "bin_tree.h"
+#include <sstream>
+#include <limits> // Necesario para std::numeric_limits
 
-// Helper function to print elements of a list
+// Tu función printList (sin cambios)
 template <class T>
 void printList(const std::list<T>& l, const std::string& title) {
     std::cout << title << ": [";
-    // C++98 requires typename for dependent types
     typename std::list<T>::const_iterator it = l.begin();
-    bool first = true;
     while (it != l.end()) {
-        if (!first) {
-            std::cout << ", ";
-        }
         std::cout << *it;
-        first = false;
         ++it;
-    }
-    std::cout << "]" << std::endl;
-}
-
-// Overload for list<string> specifically if needed for different formatting
-void printStringList(const std::list<std::string>& l, const std::string& title) {
-    std::cout << title << ": [";
-    std::list<std::string>::const_iterator it = l.begin();
-    bool first = true;
-    while (it != l.end()) {
-        if (!first) {
+        if (it != l.end()) {
             std::cout << ", ";
         }
-        std::cout << "\"" << *it << "\""; // Add quotes for strings
-        first = false;
-        ++it;
     }
     std::cout << "]" << std::endl;
 }
-
 
 int main() {
-    std::cout << "--- Testing N-ary Tree Basic Operations ---" << std::endl;
-    NTree<char> tree;
-    std::cout << "Initial empty tree:" << std::endl;
-    std::cout << "isEmpty? " << (tree.isEmpty() ? "Yes" : "No") << std::endl; // Expected: Yes
-    std::cout << "Weight: " << tree.getWeight() << std::endl; // Expected: 0
 
-    // Test single node constructor
-    NTree<char> treeA('A');
-    std::cout << "\nTree with single node 'A':" << std::endl;
-    std::cout << "isEmpty? " << (treeA.isEmpty() ? "Yes" : "No") << std::endl; // Expected: No
-    std::cout << "Weight: " << treeA.getWeight() << std::endl; // Expected: 1
-    try {
-        std::cout << "Root Info: " << treeA.getRootInfo() << std::endl; // Expected: A
-    } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+    BinTree<std::string> treeCase; 
+    int cases = 0, n_trees = 0, height, distance, count_MUP, max_MUP;
+    std::string line1, line2, line_alumn, firstOrder, secondOrder, value;
+    std::list<std::string> LInorden, LPreorden, LPostorden, LAlumn;
+
+    if (!(std::cin >> cases)) {
+         std::cerr << "Error al leer el numero de casos." << std::endl;
+         return 1;
     }
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-    // --- Test Construction / Modification ---
-    std::cout << "\n--- Testing Construction / Modification ---" << std::endl;
-    // Build tree using attachChildrenToNode
-    //      A
-    //    / | \
-    //   B  C  D
-    //  / \    |
-    // E   F   G
+    for (int i = 0; i < cases; i++) {
 
-    std::cout << "Building tree structure..." << std::endl;
-    std::list< NTree<char> > childrenB;
-    childrenB.push_back(NTree<char>('E'));
-    childrenB.push_back(NTree<char>('F'));
-    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('B'))); // Add B as child of A
-    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('C'))); // Add C as child of A (should replace B?) NO, attachChildrenToNode replaces ALL children
-    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('D'))); // Add D as child of A (should replace C?) YES. Let's rebuild correctly.
+        max_MUP = 0;
 
-    NTree<char> testTree('A');
-    std::list< NTree<char> > childrenA;
-    childrenA.push_back(NTree<char>('B'));
-    childrenA.push_back(NTree<char>('C'));
-    childrenA.push_back(NTree<char>('D'));
-    testTree.attachChildrenToNode('A', childrenA); // Attach B, C, D to A
-
-    std::list< NTree<char> > childrenB_correct;
-    childrenB_correct.push_back(NTree<char>('E'));
-    childrenB_correct.push_back(NTree<char>('F'));
-    testTree.attachChildrenToNode('B', childrenB_correct); // Attach E, F to B
-
-    std::list< NTree<char> > childrenD;
-    childrenD.push_back(NTree<char>('G'));
-    testTree.attachChildrenToNode('D', childrenD); // Attach G to D
-
-    std::cout << "\nTree after building with attachChildrenToNode:" << std::endl;
-    std::cout << "Weight: " << testTree.getWeight() << std::endl; // Expected: 7 (A,B,C,D,E,F,G)
-
-    // Test Traversals
-    std::cout << "\nTesting Traversals:" << std::endl;
-    printList(testTree.preOrder(),   "PreOrder  "); // Expected: [A, B, E, F, C, D, G]
-    printList(testTree.inOrder(),    "InOrder   "); // Expected: [E, B, F, A, C, G, D] (N-ary: 1st child -> root -> siblings)
-    printList(testTree.postOrder(),  "PostOrder "); // Expected: [E, F, B, C, G, D, A]
-    printList(testTree.levelOrder(), "LevelOrder"); // Expected: [A, B, C, D, E, F, G]
-
-    // Test insertSubtree (add H as last child of A)
-    std::cout << "\nInserting subtree 'H' under 'A'..." << std::endl;
-    NTree<char> treeH('H');
-    testTree.insertSubtree(treeH);
-    std::cout << "Weight after insert: " << testTree.getWeight() << std::endl; // Expected: 8
-    printList(testTree.levelOrder(), "LevelOrder after insert"); // Expected: [A, B, C, D, H, E, F, G]
-
-    // Test removeSubtree
-    std::cout << "\nRemoving 2nd child ('C') from 'A'..." << std::endl;
-    if (testTree.removeSubtree(2)) { // Remove C (position 2)
-         std::cout << "Removal successful." << std::endl;
-         std::cout << "Weight after remove: " << testTree.getWeight() << std::endl; // Expected: 7
-         printList(testTree.levelOrder(), "LevelOrder after remove"); // Expected: [A, B, D, H, E, F, G]
-    } else {
-         std::cout << "Removal failed." << std::endl;
-    }
-     std::cout << "Removing 10th child (invalid) from 'A'..." << std::endl;
-     if (!testTree.removeSubtree(10)) { // Remove invalid position
-          std::cout << "Removal correctly failed for invalid position." << std::endl;
-     }
-
-
-    // --- Test Properties ---
-    std::cout << "\n--- Testing Properties ---" << std::endl;
-    // Tree should now be:
-    //      A
-    //    / | \
-    //   B  D  H
-    //  / \ |
-    // E   F G
-    std::cout << "Current Weight: " << testTree.getWeight() << std::endl; // Expected: 7
-    std::cout << "Height: " << testTree.getHeight() << std::endl; // Expected: 2
-    printList(testTree.getLeaves(), "Leaves    "); // Expected: [E, F, G, H] (Order may vary)
-
-    // Test getLevel
-    std::cout << "Nodes at Level 0: "; printStringList(testTree.getLevel(0), ""); // Expected: ["A"]
-    std::cout << "Nodes at Level 1: "; printStringList(testTree.getLevel(1), ""); // Expected: ["B", "D", "H"]
-    std::cout << "Nodes at Level 2: "; printStringList(testTree.getLevel(2), ""); // Expected: ["E", "F", "G"]
-    std::cout << "Nodes at Level 3: "; printStringList(testTree.getLevel(3), ""); // Expected: []
-
-    // --- Test Copying / Assignment ---
-    std::cout << "\n--- Testing Copying / Assignment ---" << std::endl;
-    NTree<char> treeCopy(testTree);
-    NTree<char> treeAssign;
-    treeAssign = testTree;
-
-    std::cout << "Inserting subtree 'I' under 'A' in original..." << std::endl;
-    testTree.insertSubtree(NTree<char>('I')); // A now has children B, D, H, I
-
-    std::cout << "Original Weight: " << testTree.getWeight() << std::endl; // Expected: 8
-    std::cout << "Copy Weight (should be unchanged): " << treeCopy.getWeight() << std::endl; // Expected: 7
-    std::cout << "Assign Weight (should be unchanged): " << treeAssign.getWeight() << std::endl; // Expected: 7
-
-    printList(testTree.levelOrder(), "Original LevelOrder");
-    printList(treeCopy.levelOrder(), "Copy LevelOrder    ");
-    printList(treeAssign.levelOrder(), "Assign LevelOrder  ");
-
-    // --- Test Path, LCA, Diameter ---
-    // Using treeCopy which is A{ B{E,F}, D{G}, H }
-    std::cout << "\n--- Testing Path, LCA, Diameter (on copied tree) ---" << std::endl;
-    printList(treeCopy.findPathToNode('F'), "Path to F "); // Expected: [A, B, F]
-    printList(treeCopy.findPathToNode('G'), "Path to G "); // Expected: [A, D, G]
-    printList(treeCopy.findPathToNode('H'), "Path to H "); // Expected: [A, H]
-    printList(treeCopy.findPathToNode('Z'), "Path to Z "); // Expected: []
-
-    printList(treeCopy.findPathBetweenNodes('E', 'G'), "Path E <-> G"); // Expected: [E, B, A, D, G]
-    printList(treeCopy.findPathBetweenNodes('F', 'H'), "Path F <-> H"); // Expected: [F, B, A, H]
-    printList(treeCopy.findPathBetweenNodes('A', 'G'), "Path A <-> G"); // Expected: [A, D, G]
-
-    try {
-        std::cout << "LCA(E, G): " << treeCopy.lowestCommonAncestor('E', 'G') << std::endl; // Expected: A
-        std::cout << "LCA(E, F): " << treeCopy.lowestCommonAncestor('E', 'F') << std::endl; // Expected: B
-        std::cout << "LCA(D, G): " << treeCopy.lowestCommonAncestor('D', 'G') << std::endl; // Expected: D
-        std::cout << "LCA(A, H): " << treeCopy.lowestCommonAncestor('A', 'H') << std::endl; // Expected: A
-        // std::cout << "LCA(E, Z): " << treeCopy.lowestCommonAncestor('E', 'Z') << std::endl; // Throws exception
-    } catch(const std::exception& e) {
-         std::cerr << "LCA Error: " << e.what() << std::endl;
-    }
-
-    printList(treeCopy.getDiameterPath(), "Diameter Path "); // Expected: [E, B, A, D, G] or [F, B, A, D, G] (Length 5)
-
-    // Test getChildren
-    std::cout << "\nTesting getChildren for root 'A' (on copied tree)..." << std::endl;
-    std::list< NTree<char> > rootChildren = treeCopy.getChildren();
-    std::cout << "Number of children found: " << rootChildren.size() << std::endl; // Expected: 3
-    // Print root of each child subtree
-    std::list<char> childRoots;
-    for (typename std::list< NTree<char> >::iterator it = rootChildren.begin(); it != rootChildren.end(); ++it) {
-        try {
-            childRoots.push_back(it->getRootInfo());
-        } catch (const std::exception& e) {
-            std::cerr << "Error getting child root: " << e.what() << std::endl;
+        if (!(std::cin >> n_trees)) {
+            std::cerr << "Error al leer el numero de arboles" << i + 1 << std::endl;
+            return 1;
         }
-    }
-    printList(childRoots, "Root nodes of children"); // Expected: [B, D, H] (Order matters!)
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+        for (int j = 0; j < n_trees; j++) {
+            // std::cout << "--- Arbol " << j + 1 << " ---" << std::endl;
+
+            LInorden.clear();
+            LPreorden.clear();
+            LPostorden.clear();
+            LAlumn.clear();
+
+            treeCase.makeEmpty();
 
 
-    std::cout << "\n--- Testing Finished ---" << std::endl;
+            // Leer la primera línea de orden
+            if (!std::getline(std::cin, line1) || line1.empty()) {
+                 std::cerr << "Error al leer la primera linea de orden o esta vacia." << std::endl;
+                 return 1;
+            }
+            std::istringstream ss1(line1);
+            ss1 >> firstOrder;
+
+            // Leer la segunda línea de orden
+            if (!std::getline(std::cin, line2) || line2.empty()) {
+                 std::cerr << "Error al leer la segunda linea de orden o esta vacia." << std::endl;
+                 return 1;
+            }
+            std::istringstream ss2(line2);
+            ss2 >> secondOrder;
+
+            // Procesar la primera línea
+            if (firstOrder == "INORDEN") {
+                while (ss1 >> value) { LInorden.push_back(value); }
+            } else if (firstOrder == "PREORDEN") {
+                while (ss1 >> value) { LPreorden.push_back(value); }
+            } else if (firstOrder == "POSTORDEN") {
+                while (ss1 >> value) { LPostorden.push_back(value); }
+            } else {
+                std::cerr << "Error: Orden desconocido en la primera linea: " << firstOrder << std::endl;
+                return 1;
+            }
+
+            // Procesar la segunda línea
+            if (secondOrder == "INORDEN") {
+                while (ss2 >> value) { LInorden.push_back(value); }
+            } else if (secondOrder == "PREORDEN") {
+                while (ss2 >> value) { LPreorden.push_back(value); }
+            } else if (secondOrder == "POSTORDEN") {
+                while (ss2 >> value) { LPostorden.push_back(value); }
+            } else {
+                 std::cerr << "Error: Orden desconocido en la segunda linea: " << secondOrder << std::endl;
+                 return 1;
+            }
+
+            // Validar que se leyeron los órdenes esperados (INORDEN y uno de los otros dos)
+            if (LInorden.empty() || (LPreorden.empty() && LPostorden.empty())) {
+                 std::cerr << "Error: No se pudo leer INORDEN y PREORDEN/POSTORDEN correctamente." << std::endl;
+                 // Podrías añadir más lógica aquí para verificar combinaciones inválidas si quieres
+                 return 1;
+            }
+             if (!LPreorden.empty() && !LPostorden.empty()) {
+                 std::cerr << "Error: Se leyeron PREORDEN y POSTORDEN para el mismo arbol." << std::endl;
+                 return 1;
+            }
+
+
+            // Leer la lista de alumnos
+            if (!std::getline(std::cin, line_alumn) || line_alumn.empty()) {
+                 std::cerr << "Error al leer la linea de alumnos o esta vacia." << std::endl;
+                 return 1;
+            }
+            std::istringstream ss_alumn(line_alumn);
+            while (ss_alumn >> value) {
+                LAlumn.push_back(value);
+            }
+
+            // std::cout << "Listas leidas para Arbol " << j + 1 << ":" << std::endl;
+            // if (!LInorden.empty()) printList(LInorden, "  Inorden");
+            // if (!LPreorden.empty()) printList(LPreorden, "  Preorden");
+            // if (!LPostorden.empty()) printList(LPostorden, "  Postorden");
+            // if (!LAlumn.empty()) printList(LAlumn, "  Alumnos");
+            // std::cout << "--------------------" << std::endl;
+
+            // Aquí iría el código para construir el árbol y procesar la lista de alumnos
+            // Ejemplo: bst.buildFromOrders(LInorden, LPreorden, LPostorden); // Necesitas una función así
+            //          procesarAlumnos(bst, LAlumn);
+
+            if (!LPreorden.empty())
+            {
+                treeCase.buildFromPreIn(LPreorden, LInorden);
+
+            }else{
+                treeCase.buildFromPostIn(LPostorden, LInorden);
+            }
+
+            count_MUP = 0;
+            distance = 0;
+            height = 0;
+
+            for (std::list<std::string>::iterator i = LAlumn.begin(); i != LAlumn.end(); ++i) {
+                for (std::list<std::string>::iterator j = i; j != LAlumn.end(); ++j) {
+                    if (i == j) continue;
+
+                    distance = treeCase.findPathBetweenNodes(*i,*j).size() - 2;
+                    height = treeCase.getHeightDifference(*i,*j);
+
+                    count_MUP += distance * height;
+
+
+                }
+            }
+
+            if(count_MUP > max_MUP){
+                max_MUP = count_MUP;
+            }
+
+            
+
+        } // fin del bucle de árboles (j)
+
+        std::cout << max_MUP << std::endl;
+
+    } // fin del bucle de casos (i)
 
     return 0;
 }
