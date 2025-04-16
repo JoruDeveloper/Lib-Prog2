@@ -1,201 +1,200 @@
 #include <iostream>
 #include <list>
-#include <string> // Para usar std::string en la función de impresión
-#include <exception> // Para std::exception
-#include "bin_tree.h" // Asume que bin_tree.h incluye node_bin_tree.h
-
-
+#include <string>
+#include <exception>
+#include "n_tree.h" // Asume que incluye node_n_tree.h
 
 // Helper function to print elements of a list
 template <class T>
 void printList(const std::list<T>& l, const std::string& title) {
     std::cout << title << ": [";
+    // C++98 requires typename for dependent types
     typename std::list<T>::const_iterator it = l.begin();
+    bool first = true;
     while (it != l.end()) {
-        std::cout << *it;
-        ++it;
-        if (it != l.end()) {
+        if (!first) {
             std::cout << ", ";
         }
+        std::cout << *it;
+        first = false;
+        ++it;
     }
     std::cout << "]" << std::endl;
 }
 
+// Overload for list<string> specifically if needed for different formatting
+void printStringList(const std::list<std::string>& l, const std::string& title) {
+    std::cout << title << ": [";
+    std::list<std::string>::const_iterator it = l.begin();
+    bool first = true;
+    while (it != l.end()) {
+        if (!first) {
+            std::cout << ", ";
+        }
+        std::cout << "\"" << *it << "\""; // Add quotes for strings
+        first = false;
+        ++it;
+    }
+    std::cout << "]" << std::endl;
+}
+
+
 int main() {
-    // --- Test Basic Operations and BST ---
-    std::cout << "--- Testing Basic Operations and BST ---" << std::endl;
-    BinTree<int> bst;
+    std::cout << "--- Testing N-ary Tree Basic Operations ---" << std::endl;
+    NTree<char> tree;
     std::cout << "Initial empty tree:" << std::endl;
-    std::cout << "isEmpty? " << (bst.isEmpty() ? "Yes" : "No") << std::endl; // Expected: Yes
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 0
+    std::cout << "isEmpty? " << (tree.isEmpty() ? "Yes" : "No") << std::endl; // Expected: Yes
+    std::cout << "Weight: " << tree.getWeight() << std::endl; // Expected: 0
 
-    // Test insertBST
-    std::cout << "\nInserting BST elements: 50, 30, 70, 20, 40, 60, 80" << std::endl;
-    bst.insertBST(50);
-    bst.insertBST(30);
-    bst.insertBST(70);
-    bst.insertBST(20);
-    bst.insertBST(40);
-    bst.insertBST(60);
-    bst.insertBST(80);
-
-    std::cout << "\nAfter insertions:" << std::endl;
-    std::cout << "isEmpty? " << (bst.isEmpty() ? "Yes" : "No") << std::endl; // Expected: No
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 7
+    // Test single node constructor
+    NTree<char> treeA('A');
+    std::cout << "\nTree with single node 'A':" << std::endl;
+    std::cout << "isEmpty? " << (treeA.isEmpty() ? "Yes" : "No") << std::endl; // Expected: No
+    std::cout << "Weight: " << treeA.getWeight() << std::endl; // Expected: 1
     try {
-        std::cout << "Root Info: " << bst.getRootInfo() << std::endl; // Expected: 50
+        std::cout << "Root Info: " << treeA.getRootInfo() << std::endl; // Expected: A
     } catch (const std::exception& e) {
-        std::cerr << "Error getting root info: " << e.what() << std::endl;
+        std::cerr << "Error: " << e.what() << std::endl;
     }
 
-    // Test Traversals on BST
-    std::cout << "\nTesting Traversals on BST:" << std::endl;
-    printList(bst.preOrder(),   "PreOrder  "); // Expected: [50, 30, 20, 40, 70, 60, 80]
-    printList(bst.inOrder(),    "InOrder   "); // Expected: [20, 30, 40, 50, 60, 70, 80] (Sorted)
-    printList(bst.postOrder(),  "PostOrder "); // Expected: [20, 40, 30, 60, 80, 70, 50]
-    printList(bst.levelOrder(), "LevelOrder"); // Expected: [50, 30, 70, 20, 40, 60, 80]
+    // --- Test Construction / Modification ---
+    std::cout << "\n--- Testing Construction / Modification ---" << std::endl;
+    // Build tree using attachChildrenToNode
+    //      A
+    //    / | \
+    //   B  C  D
+    //  / \    |
+    // E   F   G
 
-    // Test Properties
-    std::cout << "\nTesting Properties on BST:" << std::endl;
-    std::cout << "Height: " << bst.getHeight() << std::endl; // Expected: 2 (Root level 0)
-    printList(bst.getLeaves(), "Leaves    "); // Expected: [20, 40, 60, 80] (Order depends on GET_LEAVES implementation)
+    std::cout << "Building tree structure..." << std::endl;
+    std::list< NTree<char> > childrenB;
+    childrenB.push_back(NTree<char>('E'));
+    childrenB.push_back(NTree<char>('F'));
+    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('B'))); // Add B as child of A
+    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('C'))); // Add C as child of A (should replace B?) NO, attachChildrenToNode replaces ALL children
+    treeA.attachChildrenToNode('A', std::list< NTree<char> >(1, NTree<char>('D'))); // Add D as child of A (should replace C?) YES. Let's rebuild correctly.
+
+    NTree<char> testTree('A');
+    std::list< NTree<char> > childrenA;
+    childrenA.push_back(NTree<char>('B'));
+    childrenA.push_back(NTree<char>('C'));
+    childrenA.push_back(NTree<char>('D'));
+    testTree.attachChildrenToNode('A', childrenA); // Attach B, C, D to A
+
+    std::list< NTree<char> > childrenB_correct;
+    childrenB_correct.push_back(NTree<char>('E'));
+    childrenB_correct.push_back(NTree<char>('F'));
+    testTree.attachChildrenToNode('B', childrenB_correct); // Attach E, F to B
+
+    std::list< NTree<char> > childrenD;
+    childrenD.push_back(NTree<char>('G'));
+    testTree.attachChildrenToNode('D', childrenD); // Attach G to D
+
+    std::cout << "\nTree after building with attachChildrenToNode:" << std::endl;
+    std::cout << "Weight: " << testTree.getWeight() << std::endl; // Expected: 7 (A,B,C,D,E,F,G)
+
+    // Test Traversals
+    std::cout << "\nTesting Traversals:" << std::endl;
+    printList(testTree.preOrder(),   "PreOrder  "); // Expected: [A, B, E, F, C, D, G]
+    printList(testTree.inOrder(),    "InOrder   "); // Expected: [E, B, F, A, C, G, D] (N-ary: 1st child -> root -> siblings)
+    printList(testTree.postOrder(),  "PostOrder "); // Expected: [E, F, B, C, G, D, A]
+    printList(testTree.levelOrder(), "LevelOrder"); // Expected: [A, B, C, D, E, F, G]
+
+    // Test insertSubtree (add H as last child of A)
+    std::cout << "\nInserting subtree 'H' under 'A'..." << std::endl;
+    NTree<char> treeH('H');
+    testTree.insertSubtree(treeH);
+    std::cout << "Weight after insert: " << testTree.getWeight() << std::endl; // Expected: 8
+    printList(testTree.levelOrder(), "LevelOrder after insert"); // Expected: [A, B, C, D, H, E, F, G]
+
+    // Test removeSubtree
+    std::cout << "\nRemoving 2nd child ('C') from 'A'..." << std::endl;
+    if (testTree.removeSubtree(2)) { // Remove C (position 2)
+         std::cout << "Removal successful." << std::endl;
+         std::cout << "Weight after remove: " << testTree.getWeight() << std::endl; // Expected: 7
+         printList(testTree.levelOrder(), "LevelOrder after remove"); // Expected: [A, B, D, H, E, F, G]
+    } else {
+         std::cout << "Removal failed." << std::endl;
+    }
+     std::cout << "Removing 10th child (invalid) from 'A'..." << std::endl;
+     if (!testTree.removeSubtree(10)) { // Remove invalid position
+          std::cout << "Removal correctly failed for invalid position." << std::endl;
+     }
+
+
+    // --- Test Properties ---
+    std::cout << "\n--- Testing Properties ---" << std::endl;
+    // Tree should now be:
+    //      A
+    //    / | \
+    //   B  D  H
+    //  / \ |
+    // E   F G
+    std::cout << "Current Weight: " << testTree.getWeight() << std::endl; // Expected: 7
+    std::cout << "Height: " << testTree.getHeight() << std::endl; // Expected: 2
+    printList(testTree.getLeaves(), "Leaves    "); // Expected: [E, F, G, H] (Order may vary)
 
     // Test getLevel
-    std::cout << "Nodes at Level 0: "; printList(bst.getLevel(0), ""); // Expected: [50]
-    std::cout << "Nodes at Level 1: "; printList(bst.getLevel(1), ""); // Expected: [30, 70]
-    std::cout << "Nodes at Level 2: "; printList(bst.getLevel(2), ""); // Expected: [20, 40, 60, 80]
-    std::cout << "Nodes at Level 3: "; printList(bst.getLevel(3), ""); // Expected: []
+    std::cout << "Nodes at Level 0: "; printStringList(testTree.getLevel(0), ""); // Expected: ["A"]
+    std::cout << "Nodes at Level 1: "; printStringList(testTree.getLevel(1), ""); // Expected: ["B", "D", "H"]
+    std::cout << "Nodes at Level 2: "; printStringList(testTree.getLevel(2), ""); // Expected: ["E", "F", "G"]
+    std::cout << "Nodes at Level 3: "; printStringList(testTree.getLevel(3), ""); // Expected: []
 
-    // Test BST Search
-    std::cout << "\nTesting BST Search:" << std::endl;
-    std::cout << "Search 40: " << (bst.searchBST(40) ? "Found" : "Not Found") << std::endl; // Expected: Found
-    std::cout << "Search 90: " << (bst.searchBST(90) ? "Found" : "Not Found") << std::endl; // Expected: Not Found
+    // --- Test Copying / Assignment ---
+    std::cout << "\n--- Testing Copying / Assignment ---" << std::endl;
+    NTree<char> treeCopy(testTree);
+    NTree<char> treeAssign;
+    treeAssign = testTree;
 
-    // Test BST Remove
-    std::cout << "\nTesting BST Remove:" << std::endl;
-    std::cout << "Removing 20 (leaf): " << (bst.removeBST(20) ? "Success" : "Failed") << std::endl;
-    printList(bst.inOrder(), "InOrder after removing 20 "); // Expected: [30, 40, 50, 60, 70, 80]
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 6
+    std::cout << "Inserting subtree 'I' under 'A' in original..." << std::endl;
+    testTree.insertSubtree(NTree<char>('I')); // A now has children B, D, H, I
 
-    std::cout << "Removing 70 (two children): " << (bst.removeBST(70) ? "Success" : "Failed") << std::endl;
-    printList(bst.inOrder(), "InOrder after removing 70 "); // Expected: [30, 40, 50, 60, 80] (70 replaced by 80)
-    printList(bst.levelOrder(), "LevelOrder after removing 70"); // Structure changes
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 5
+    std::cout << "Original Weight: " << testTree.getWeight() << std::endl; // Expected: 8
+    std::cout << "Copy Weight (should be unchanged): " << treeCopy.getWeight() << std::endl; // Expected: 7
+    std::cout << "Assign Weight (should be unchanged): " << treeAssign.getWeight() << std::endl; // Expected: 7
 
-    std::cout << "Removing 30 (one child): " << (bst.removeBST(30) ? "Success" : "Failed") << std::endl;
-    printList(bst.inOrder(), "InOrder after removing 30 "); // Expected: [40, 50, 60, 80]
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 4
-
-    std::cout << "Removing 50 (root, two children): " << (bst.removeBST(50) ? "Success" : "Failed") << std::endl;
-    printList(bst.inOrder(), "InOrder after removing 50 "); // Expected: [40, 60, 80]
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 3
-    try {
-        std::cout << "New Root Info: " << bst.getRootInfo() << std::endl; // Expected: 60 (successor of 50)
-    } catch (const std::exception& e) {
-        std::cerr << "Error getting root info: " << e.what() << std::endl;
-    }
-
-    std::cout << "Removing 99 (not present): " << (bst.removeBST(99) ? "Success" : "Failed") << std::endl; // Expected: Failed
-    std::cout << "Weight: " << bst.getWeight() << std::endl; // Expected: 3
-
-    // --- Test Copying and Assignment ---
-    std::cout << "\n--- Testing Copying and Assignment ---" << std::endl;
-    BinTree<int> bstCopy(bst); // Copy constructor
-    BinTree<int> bstAssign;
-    bstAssign = bst;        // Assignment operator
-
-    std::cout << "Original Weight: " << bst.getWeight() << std::endl;
-    std::cout << "Copy Weight: " << bstCopy.getWeight() << std::endl;
-    std::cout << "Assign Weight: " << bstAssign.getWeight() << std::endl;
-
-    std::cout << "Modifying original BST by inserting 70..." << std::endl;
-    bst.insertBST(70);
-    std::cout << "Original Weight after insert: " << bst.getWeight() << std::endl; // Expected: 4
-    std::cout << "Copy Weight (should be unchanged): " << bstCopy.getWeight() << std::endl; // Expected: 3
-    std::cout << "Assign Weight (should be unchanged): " << bstAssign.getWeight() << std::endl; // Expected: 3
-    printList(bst.inOrder(), "Original InOrder ");
-    printList(bstCopy.inOrder(), "Copy InOrder     ");
-    printList(bstAssign.inOrder(), "Assign InOrder   ");
-
-    // --- Test Reconstruction ---
-    std::cout << "\n--- Testing Reconstruction ---" << std::endl;
-    BinTree<char> treePreIn;
-    std::list<char> pre;
-    pre.push_back('A'); pre.push_back('B'); pre.push_back('D'); pre.push_back('E');
-    pre.push_back('C'); pre.push_back('F');
-    std::list<char> in;
-    in.push_back('D'); in.push_back('B'); in.push_back('E'); in.push_back('A');
-    in.push_back('F'); in.push_back('C');
-
-    std::cout << "Building tree from Pre/In..." << std::endl;
-    printList(pre, "PreOrder List ");
-    printList(in,  "InOrder List  ");
-    treePreIn.buildFromPreIn(pre, in);
-    std::cout << "Weight after build: " << treePreIn.getWeight() << std::endl; // Expected: 6
-    printList(treePreIn.preOrder(),   "Result PreOrder  ");
-    printList(treePreIn.inOrder(),    "Result InOrder   ");
-    printList(treePreIn.postOrder(),  "Result PostOrder "); // Expected: [D, E, B, F, C, A]
-    printList(treePreIn.levelOrder(), "Result LevelOrder"); // Expected: [A, B, C, D, E, F]
-    std::cout << "Height: " << treePreIn.getHeight() << std::endl; // Expected: 2
-
-    BinTree<char> treePostIn;
-    std::list<char> post;
-    post.push_back('D'); post.push_back('E'); post.push_back('B'); post.push_back('F');
-    post.push_back('C'); post.push_back('A');
-    // Use the same 'in' list
-
-    std::cout << "\nBuilding tree from Post/In..." << std::endl;
-    printList(post, "PostOrder List");
-    printList(in,   "InOrder List  "); // Same as before
-    treePostIn.buildFromPostIn(post, in);
-    std::cout << "Weight after build: " << treePostIn.getWeight() << std::endl; // Expected: 6
-    printList(treePostIn.preOrder(),   "Result PreOrder  "); // Expected: [A, B, D, E, C, F]
-    printList(treePostIn.inOrder(),    "Result InOrder   "); // Expected: [D, B, E, A, F, C]
-    printList(treePostIn.postOrder(),  "Result PostOrder "); // Expected: [D, E, B, F, C, A]
-    printList(treePostIn.levelOrder(), "Result LevelOrder"); // Expected: [A, B, C, D, E, F]
+    printList(testTree.levelOrder(), "Original LevelOrder");
+    printList(treeCopy.levelOrder(), "Copy LevelOrder    ");
+    printList(treeAssign.levelOrder(), "Assign LevelOrder  ");
 
     // --- Test Path, LCA, Diameter ---
-    // Use the tree built from Pre/In (treePreIn)
-    std::cout << "\n--- Testing Path, LCA, Diameter (on treePreIn) ---" << std::endl;
-    printList(treePreIn.findPathToNode('E'), "Path to E "); // Expected: [A, B, E]
-    printList(treePreIn.findPathToNode('F'), "Path to F "); // Expected: [A, C, F]
-    printList(treePreIn.findPathToNode('G'), "Path to G "); // Expected: [] (Not found)
+    // Using treeCopy which is A{ B{E,F}, D{G}, H }
+    std::cout << "\n--- Testing Path, LCA, Diameter (on copied tree) ---" << std::endl;
+    printList(treeCopy.findPathToNode('F'), "Path to F "); // Expected: [A, B, F]
+    printList(treeCopy.findPathToNode('G'), "Path to G "); // Expected: [A, D, G]
+    printList(treeCopy.findPathToNode('H'), "Path to H "); // Expected: [A, H]
+    printList(treeCopy.findPathToNode('Z'), "Path to Z "); // Expected: []
 
-    printList(treePreIn.findPathBetweenNodes('D', 'F'), "Path D <-> F"); // Expected: [D, B, A, C, F]
-    printList(treePreIn.findPathBetweenNodes('E', 'F'), "Path E <-> F"); // Expected: [E, B, A, C, F]
-    printList(treePreIn.findPathBetweenNodes('B', 'D'), "Path B <-> D"); // Expected: [B, D]
+    printList(treeCopy.findPathBetweenNodes('E', 'G'), "Path E <-> G"); // Expected: [E, B, A, D, G]
+    printList(treeCopy.findPathBetweenNodes('F', 'H'), "Path F <-> H"); // Expected: [F, B, A, H]
+    printList(treeCopy.findPathBetweenNodes('A', 'G'), "Path A <-> G"); // Expected: [A, D, G]
 
     try {
-        std::cout << "LCA(D, F): " << treePreIn.lowestCommonAncestor('D', 'F') << std::endl; // Expected: A
-        std::cout << "LCA(E, D): " << treePreIn.lowestCommonAncestor('E', 'D') << std::endl; // Expected: B
-        std::cout << "LCA(A, F): " << treePreIn.lowestCommonAncestor('A', 'F') << std::endl; // Expected: A
-        // std::cout << "LCA(D, G): " << treePreIn.lowestCommonAncestor('D', 'G') << std::endl; // Expected: throws exception
+        std::cout << "LCA(E, G): " << treeCopy.lowestCommonAncestor('E', 'G') << std::endl; // Expected: A
+        std::cout << "LCA(E, F): " << treeCopy.lowestCommonAncestor('E', 'F') << std::endl; // Expected: B
+        std::cout << "LCA(D, G): " << treeCopy.lowestCommonAncestor('D', 'G') << std::endl; // Expected: D
+        std::cout << "LCA(A, H): " << treeCopy.lowestCommonAncestor('A', 'H') << std::endl; // Expected: A
+        // std::cout << "LCA(E, Z): " << treeCopy.lowestCommonAncestor('E', 'Z') << std::endl; // Throws exception
     } catch(const std::exception& e) {
          std::cerr << "LCA Error: " << e.what() << std::endl;
     }
 
-    printList(treePreIn.getDiameterPath(), "Diameter Path "); // Expected: [D, B, A, C, F] or [E, B, A, C, F] (length 5)
+    printList(treeCopy.getDiameterPath(), "Diameter Path "); // Expected: [E, B, A, D, G] or [F, B, A, D, G] (Length 5)
 
-    // --- Test Manual Construction and Subtrees ---
-     std::cout << "\n--- Testing Manual Construction and Subtrees ---" << std::endl;
-     BinTree<int> leftSub(20);
-     BinTree<int> rightSub(30);
-     BinTree<int> manualTree(10, leftSub, rightSub); // Root 10, left 20, right 30
-
-     std::cout << "Manual Tree Weight: " << manualTree.getWeight() << std::endl; // Expected: 3
-     printList(manualTree.inOrder(), "Manual Tree InOrder "); // Expected: [20, 10, 30]
-
-     BinTree<int> gotLeft = manualTree.getLeftSubtree();
-     std::cout << "Got Left Subtree Weight: " << gotLeft.getWeight() << std::endl; // Expected: 1
-     try {
-        std::cout << "Got Left Subtree Root: " << gotLeft.getRootInfo() << std::endl; // Expected: 20
-     } catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
-
-     BinTree<int> gotRight = manualTree.getRightSubtree();
-     std::cout << "Got Right Subtree Weight: " << gotRight.getWeight() << std::endl; // Expected: 1
-      try {
-        std::cout << "Got Right Subtree Root: " << gotRight.getRootInfo() << std::endl; // Expected: 30
-     } catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
+    // Test getChildren
+    std::cout << "\nTesting getChildren for root 'A' (on copied tree)..." << std::endl;
+    std::list< NTree<char> > rootChildren = treeCopy.getChildren();
+    std::cout << "Number of children found: " << rootChildren.size() << std::endl; // Expected: 3
+    // Print root of each child subtree
+    std::list<char> childRoots;
+    for (typename std::list< NTree<char> >::iterator it = rootChildren.begin(); it != rootChildren.end(); ++it) {
+        try {
+            childRoots.push_back(it->getRootInfo());
+        } catch (const std::exception& e) {
+            std::cerr << "Error getting child root: " << e.what() << std::endl;
+        }
+    }
+    printList(childRoots, "Root nodes of children"); // Expected: [B, D, H] (Order matters!)
 
 
     std::cout << "\n--- Testing Finished ---" << std::endl;
