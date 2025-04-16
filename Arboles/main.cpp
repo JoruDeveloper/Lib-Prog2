@@ -45,7 +45,6 @@ int main() {
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         for (int j = 0; j < n_trees; j++) {
-            // std::cout << "--- Arbol " << j + 1 << " ---" << std::endl;
 
             LInorden.clear();
             LPreorden.clear();
@@ -54,8 +53,6 @@ int main() {
 
             treeCase.makeEmpty();
 
-
-            // Leer la primera línea de orden
             if (!std::getline(std::cin, line1) || line1.empty()) {
                  std::cerr << "Error al leer la primera linea de orden o esta vacia." << std::endl;
                  return 1;
@@ -63,7 +60,6 @@ int main() {
             std::istringstream ss1(line1);
             ss1 >> firstOrder;
 
-            // Leer la segunda línea de orden
             if (!std::getline(std::cin, line2) || line2.empty()) {
                  std::cerr << "Error al leer la segunda linea de orden o esta vacia." << std::endl;
                  return 1;
@@ -71,7 +67,6 @@ int main() {
             std::istringstream ss2(line2);
             ss2 >> secondOrder;
 
-            // Procesar la primera línea
             if (firstOrder == "INORDEN") {
                 while (ss1 >> value) { LInorden.push_back(value); }
             } else if (firstOrder == "PREORDEN") {
@@ -83,7 +78,6 @@ int main() {
                 return 1;
             }
 
-            // Procesar la segunda línea
             if (secondOrder == "INORDEN") {
                 while (ss2 >> value) { LInorden.push_back(value); }
             } else if (secondOrder == "PREORDEN") {
@@ -95,10 +89,8 @@ int main() {
                  return 1;
             }
 
-            // Validar que se leyeron los órdenes esperados (INORDEN y uno de los otros dos)
             if (LInorden.empty() || (LPreorden.empty() && LPostorden.empty())) {
                  std::cerr << "Error: No se pudo leer INORDEN y PREORDEN/POSTORDEN correctamente." << std::endl;
-                 // Podrías añadir más lógica aquí para verificar combinaciones inválidas si quieres
                  return 1;
             }
              if (!LPreorden.empty() && !LPostorden.empty()) {
@@ -106,8 +98,6 @@ int main() {
                  return 1;
             }
 
-
-            // Leer la lista de alumnos
             if (!std::getline(std::cin, line_alumn) || line_alumn.empty()) {
                  std::cerr << "Error al leer la linea de alumnos o esta vacia." << std::endl;
                  return 1;
@@ -116,17 +106,6 @@ int main() {
             while (ss_alumn >> value) {
                 LAlumn.push_back(value);
             }
-
-            // std::cout << "Listas leidas para Arbol " << j + 1 << ":" << std::endl;
-            // if (!LInorden.empty()) printList(LInorden, "  Inorden");
-            // if (!LPreorden.empty()) printList(LPreorden, "  Preorden");
-            // if (!LPostorden.empty()) printList(LPostorden, "  Postorden");
-            // if (!LAlumn.empty()) printList(LAlumn, "  Alumnos");
-            // std::cout << "--------------------" << std::endl;
-
-            // Aquí iría el código para construir el árbol y procesar la lista de alumnos
-            // Ejemplo: bst.buildFromOrders(LInorden, LPreorden, LPostorden); // Necesitas una función así
-            //          procesarAlumnos(bst, LAlumn);
 
             if (!LPreorden.empty())
             {
@@ -159,11 +138,11 @@ int main() {
 
             
 
-        } // fin del bucle de árboles (j)
+        }
 
         std::cout << max_MUP << std::endl;
 
-    } // fin del bucle de casos (i)
+    }
 
     return 0;
 }
