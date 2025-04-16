@@ -4,9 +4,8 @@
 #include <exception>
 #include "bin_tree.h"
 #include <sstream>
-#include <limits> // Necesario para std::numeric_limits
+#include <limits>
 
-// Tu función printList (sin cambios)
 template <class T>
 void printList(const std::list<T>& l, const std::string& title) {
     std::cout << title << ": [";
@@ -53,7 +52,7 @@ int main() {
 
             treeCase.makeEmpty();   // Limpiar el arbol
 
-            if (!std::getline(std::cin, line1) || line1.empty()) {  // Leer Primera línea del caso
+            if (!std::getline(std::cin, line1)) {       // Leer Primera línea del caso
                  std::cerr << "Error Linea 1" << std::endl;
                  return 1;
             }
@@ -61,15 +60,15 @@ int main() {
             std::istringstream ss1(line1);
             ss1 >> firstOrder;
 
-            if (!std::getline(std::cin, line2) || line2.empty()) {// Leer segunda línea del caso
+            if (!std::getline(std::cin, line2)) {       // Leer segunda línea del caso
                  std::cerr << "Error Linea 2" << std::endl;
                  return 1;
             }
-            
+
             std::istringstream ss2(line2);
             ss2 >> secondOrder;
 
-            if (firstOrder == "INORDEN"){
+            if (firstOrder == "INORDEN"){   // Primera linea inorden
                 while (ss1 >> value){
                     LInorden.push_back(value); 
                 }
@@ -84,7 +83,7 @@ int main() {
             } else 
                 return 1;
 
-            if (secondOrder == "INORDEN"){
+            if (secondOrder == "INORDEN"){  // Segunda linea inorden
                 while (ss2 >> value){
                     LInorden.push_back(value);
                 }
@@ -99,25 +98,17 @@ int main() {
             } else
                  return 1;
 
-            // if (LInorden.empty() || (LPreorden.empty() && LPostorden.empty())) {
-            //      std::cerr << "Error: No se pudo leer INORDEN y PREORDEN/POSTORDEN correctamente." << std::endl;
-            //      return 1;
-            // }
-            //  if (!LPreorden.empty() && !LPostorden.empty()) {
-            //      std::cerr << "Error: Se leyeron PREORDEN y POSTORDEN para el mismo arbol." << std::endl;
-            //      return 1;
-            // }
+            if (!std::getline(std::cin, line_alumn)) {  // Leer Linea alumnos para MUP
+                 std::cerr << "Error Linea Alumnos" << std::endl;
+                 return 1;
+            }
 
-            // if (!std::getline(std::cin, line_alumn) || line_alumn.empty()) {
-            //      std::cerr << "Error al leer la linea de alumnos o esta vacia." << std::endl;
-            //      return 1;
-            // }
-            std::istringstream ss_alumn(line_alumn);
+            std::istringstream ss_alumn(line_alumn);    // Insertar valores a la lista
             while (ss_alumn >> value) {
                 LAlumn.push_back(value);
             }
 
-            if (!LPreorden.empty())
+            if (!LPreorden.empty())                     // Insertar en Preorden o en Postorden
             {
                 treeCase.buildFromPreIn(LPreorden, LInorden);
 
@@ -131,7 +122,7 @@ int main() {
 
             // printTreeStructure(treeCase);
 
-            for (std::list<std::string>::iterator i = LAlumn.begin(); i != LAlumn.end(); ++i) {
+            for (std::list<std::string>::iterator i = LAlumn.begin(); i != LAlumn.end(); ++i){  // Calcular MUP
                 for (std::list<std::string>::iterator j = i; j != LAlumn.end(); ++j) {
                     if (i == j) continue;
 
@@ -146,15 +137,13 @@ int main() {
                 }
             }
 
-            if(count_MUP > max_MUP){
+            if(count_MUP > max_MUP){        // Asignar nuevo MUP máximo si es mayor al actual
                 max_MUP = count_MUP;
             }
 
-            
-            
-            std::cout << max_MUP << std::endl;
         }
 
+        std::cout << max_MUP << std::endl;  // Imprimir el MUP mayor
 
     }
 
