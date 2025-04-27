@@ -1,7 +1,7 @@
 # Makefile para compilar archivos en el directorio actual
 # Nombre del ejecutable, deseable en mayúsculas
 
-TARGET = arboles
+TARGET = RUN
 
 # Bibliotecas incluidas, la biblioteca math.h es una muy común
 LIBS = -lm
