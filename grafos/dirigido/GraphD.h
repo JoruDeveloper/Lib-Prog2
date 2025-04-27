@@ -38,7 +38,7 @@ private:
     // -- Private Helper Methods (UPPER_SNAKE_CASE) --
 
     // Finds the vertex node *preceding* the one with 'value', or NULL if not found or list empty. If value is at head, returns firstVertex itself.
-    VertexNode<elem>* FIND_VERTEX_NODE_PREDECESSOR(const elem& value) {
+    VertexNode<elem>* FIND_VERTEX_NODE_PREDECESSOR(const elem& value) const {
         VertexNode<elem>* current = firstVertex;
         VertexNode<elem>* previous = NULL;
 
@@ -66,7 +66,7 @@ private:
     }
 
     // Finds the vertex node with the given value. Returns pointer to the node or NULL.
-    VertexNode<elem>* FIND_VERTEX_NODE(const elem& value) {
+    VertexNode<elem>* FIND_VERTEX_NODE(const elem& value) const {
          VertexNode<elem>* current = firstVertex;
          while(current != NULL) {
              if (current->getData() == value) {
@@ -82,7 +82,7 @@ private:
 
 
     // Finds an arc node in an adjacency list starting from 'startArc' pointing to 'destValue'. Returns ArcNode* or NULL.
-    ArcNode<elem>* FIND_ARC_NODE(ArcNode<elem>* startArc, const elem& destValue) {
+    ArcNode<elem>* FIND_ARC_NODE(ArcNode<elem>* startArc, const elem& destValue) const {
         ArcNode<elem>* current = startArc;
         while (current != NULL) {
             if (current->getDestinationVertex() && current->getDestinationVertex()->getData() == destValue) {
@@ -480,7 +480,7 @@ public:
     }
 
     // Gets the weight of the arc from sourceValue to destValue. Returns weight if arc exists, -1.0f otherwise.
-    float getArcWeight(const elem& sourceValue, const elem& destValue) {
+    float getArcWeight(const elem& sourceValue, const elem& destValue) const {
         VertexNode<elem>* sourceNode = FIND_VERTEX_NODE(sourceValue);
         if (!sourceNode) {
             return -1.0f;

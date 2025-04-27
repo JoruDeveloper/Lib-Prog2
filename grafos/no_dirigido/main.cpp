@@ -7,7 +7,7 @@
 #include <algorithm>    // Para std::sort (si se usa internamente o en pruebas)
 #include <exception>    // Para std::exception
 
-// --- Helper Function to Print Lists ---
+// -- Helper Function to Print Lists --
 template <typename T>
 void printList(const std::list<T>& l, const std::string& label = "") {
     if (!label.empty()) {
